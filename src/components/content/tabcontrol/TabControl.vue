@@ -1,6 +1,8 @@
 <template>
     <div class="tab-control">
-        <div v-for="(item,index) in titles" :key="index" class="tab-control-item">
+        <div v-for="(item,index) in titles" :key="index" class="tab-control-item" 
+        :class="{active: index===currentIndex}"
+        @click="itemCick(index)">
             <span>{{item}}</span>
         </div>
     </div>
@@ -23,6 +25,11 @@ export default {
        return {
         currentIndex:0
       }
+  },
+  methods:{
+      itemCick(index){
+          this.currentIndex = index
+      }
   }
      
       
@@ -36,8 +43,21 @@ export default {
 .tab-control {
     display: flex;
     text-align: center;
+    font-size: 15px;
+    height: 40px;
+    line-height: 40px;
+    background-color: #fff;
 }
 .tab-control-item{
     flex: 1;
+}
+.tab-control-item span{
+    padding: 5px;
+}
+.active{
+    color: var(--color-high-text);
+}
+.active span{
+    border-bottom: 3px solid var(--color-tint);
 }
 </style>
