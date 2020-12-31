@@ -26,4 +26,10 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.goods{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+</style>
