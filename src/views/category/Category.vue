@@ -195,7 +195,6 @@ export default {
        */
     this.scroll =  new BScroll(document.querySelector('.wrapper'),{
       probeType:3,
-      click:true,
       pullUpLoad:true
     })
     this.scroll.on('scroll',(position) => {

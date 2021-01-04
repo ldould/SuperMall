@@ -3,6 +3,9 @@
      <nav-bar class="home-nav">
        <div slot="center">购物街</div>
      </nav-bar>
+     <scroll class="content" ref="scroll" :probe-type="3" 
+     @scroll="contentScroll"
+     :pull-up-load='true' @pullingUp="loadMore">
      <home-swiper :banners="banners"/>
      <recommend-view :recommends="recommends"/>
      <feature-view/>
@@ -10,13 +13,19 @@
       :titles="['流行','新款','精选']"
       @tabClick='tabClick'/>
       <goods-list :goods="showGoods"/>
+     </scroll>
+      <!-- 加上.native组件才可以监听点击事件 -->
+     <back-top @click.native="backClick" v-show="isShowBackTop"/>
+
   </div>
 </template>
 
 <script>
 import NavBar from 'components/common/navbar/NavBar.vue'
+import Scroll from 'components/common/scroll/Scroll.vue'
 import TabControl from 'components/content/tabcontrol/TabControl.vue'
 import GoodsList from 'components/content/goods/GoodsList.vue'
+import BackTop from 'components/content/backTop/BackTop.vue'
 
 import HomeSwiper from './childComps/HomeSwiper.vue'
 import RecommendView from './childComps/RecommendView.vue'
@@ -35,7 +44,9 @@ export default {
       RecommendView,
       FeatureView,
       TabControl,
-      GoodsList
+      GoodsList,
+      Scroll,
+      BackTop,
        
     },
         
@@ -50,7 +61,8 @@ export default {
           "new":{page:0,list:[]},
           "sell":{page:0,list:[]},
         },
-        currentType:'pop'
+        currentType:'pop',
+        isShowBackTop:false
       }
     },
     created(){
@@ -86,7 +98,16 @@ export default {
         }
       },
 
-
+      backClick(){
+        this.$refs.scroll.scrollTo(0,0,3000)
+      },
+      contentScroll(position){
+        this.isShowBackTop = (-position.y) > 1000
+      },
+      loadMore(){
+        this.getHomeGoods(this.currentType)
+        this.$refs.scroll.scroll.refresh()
+      },
 
       /**
        * 网络请求相关的方法
@@ -103,6 +124,7 @@ export default {
          getHomeGoods(type,page).then(res => {
         this.goods[type].list.push(...res.data.list)
         this.goods[type].page += 1
+        this.$refs.scroll.finishPullUp()
       })
       }
     }
@@ -113,6 +135,8 @@ export default {
 <style scoped>
 #home{
   padding-top: 44px;
+  height: 100vh;
+  position: relative;
 }
 .home-nav{
   background-color: var(--color-tint);
@@ -126,5 +150,18 @@ export default {
 .tab-control{
   position: sticky;
   top: 44px;
+  z-index: 9;
+}
+.content{
+  /* height: calc(100% - 93px);
+  overflow: hidden;
+  margin-top: 44px; */
+
+  overflow: hidden;
+  position: absolute;
+  top: 44px;
+  bottom: 49px;
+  left: 0;
+  right: 0;
 }
 </style>
