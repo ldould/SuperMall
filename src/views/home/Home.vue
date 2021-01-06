@@ -6,7 +6,6 @@
      <tab-control ref="tabControl1" 
       :titles="['流行','新款','精选']" class="tab-control" v-show="isTabFixed"
       @tabClick='tabClick'/>
-      <goods-list :goods="showGoods"/>
      <scroll class="content" ref="scroll" :probe-type="3" 
      @scroll="contentScroll"
      :pull-up-load='true' @pullingUp="loadMore">
@@ -88,15 +87,13 @@ export default {
       })
     },
     destroyed(){
-      console.log('home destroyed')
     },
     activated(){
-      this.$refs.scroll.scrollTo(0,this.saveY);
+      this.$refs.scroll.scrollTo(0,this.saveY,0);
       this.$refs.scroll.refresh()
     },
     deactivated(){
-      this.saveY = this.$refs.scroll.getScrollY()
-      console.log(this.saveY)
+      this.saveY = this.$refs.scroll.scroll.y
     },
     computed:{
       showGoods(){
@@ -131,7 +128,6 @@ export default {
 
         //2.觉得tabControl是否吸顶
         this.isTabFixed  = (-position.y) > this.tabOffsetTop
-        console.log(-position.y,'y')
       },
       loadMore(){
         this.getHomeGoods(this.currentType)

@@ -215,7 +215,8 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+
 .wrapper{
   height: 150px;
   overflow: hidden;
