@@ -8,6 +8,7 @@
       <div class="shop-middle-item shop-middle-left">
         <div class="info-sells">
           <div class="sells-count">
+            <!-- | 在vue里是一个管道符号，前面为你要过滤的值，后面是过滤器，所谓过滤就是你筛选后的值 -->
             {{shop.sells | sellCountFilter}}
           </div>
           <div class="sells-text">总销量</div>
