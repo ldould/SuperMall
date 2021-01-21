@@ -7,6 +7,8 @@
         <detail-shop-info :shop="shop"></detail-shop-info>
         <detail-goods-info :detail-info="detailInfo" @imgLoad="imgLoad"/>
         <detail-param-info :paramInfo="paramInfo"/>
+        <detail-comment-info :comment-info="commentInfo"/>
+        <goods-list :goods='recommends'/>
         </scroll>
         
     </div>
@@ -19,11 +21,13 @@ import DetailBaseInfo from './childComps/DetailBaseInfo.vue'
 import DetailShopInfo from './childComps/DetailShopInfo.vue'
 import DetailGoodsInfo from './childComps/DetailGoodsInfo.vue'
 import DetailParamInfo from './childComps/DetailParamInfo.vue'
+import DetailCommentInfo from './childComps/DetailCommentInfo.vue'
 
 import Scroll from 'components/common/scroll/Scroll.vue'
+import GoodsList from 'components/content/goods/GoodsList.vue'
 
 
-import {getDetail, Goods, Shop,GoodsParam} from 'network/detail.js'
+import {getDetail, Goods, Shop,GoodsParam,getRecommend} from 'network/detail.js'
 
 
 export default {
@@ -35,7 +39,10 @@ export default {
         DetailShopInfo,
         Scroll,
         DetailGoodsInfo,
-        DetailParamInfo
+        DetailParamInfo,
+        DetailCommentInfo,
+        GoodsList,
+        
         
     },
     data(){
@@ -45,7 +52,9 @@ export default {
             goods:{},
             shop:{},
             detailInfo:{},
-            paramInfo:{}
+            paramInfo:{},
+            commentInfo:{},
+            recommends:[]
         }
     },
     created(){
@@ -58,7 +67,12 @@ export default {
     //             this.topImages = res.result.itemInfo.topImages
     //         })
 
-     this._getDetailData()
+     this._getDetailData();
+     //请求推荐数据
+     getRecommend().then(res => {
+         this.recommends = res.data.list
+         console.log(res)
+     })
            
 
     },
@@ -70,7 +84,7 @@ export default {
             getDetail(iid).then(res => {
                 //2.1获取结果
                 const data = res.result;
-                console.log(res)
+                // console.log(res)
                 //2.2.获取顶部图片信息
                  this.topImages = data.itemInfo.topImages
                 //2.3.获取商品信息
@@ -81,6 +95,10 @@ export default {
                 this.detailInfo = data.detailInfo
                 //2.6获取参数信息
                 this.paramInfo = new GoodsParam(data.itemParams.info,data.itemParams.rule)
+                //2.7取出评论信息
+                if(data.rate.cRate !== 0){
+                    this.commentInfo = data.rate.list[0]
+                }
             })
         },
         imgLoad(){
@@ -96,7 +114,7 @@ export default {
 #detail{
     height: 100vh;
     position: relative;
-    z-index: 11;
+    z-index: 11; 
     background-color: #fff;
 }
 .detail-nav{
@@ -106,5 +124,6 @@ export default {
 }
 .content{
     height: calc(100% - 44px);
+     overflow: hidden;
 }
 </style>

@@ -53,10 +53,12 @@ font-size: 13px;
 .active{
     color: var(--color-high-text);
 }
-.left{
+
+.left .back{
     text-align: center;
-}
+} 
 .back img{
-    margin-top: 13px;
+   transform: translateY(5px);
+    display: inline-block;
 }
 </style>
