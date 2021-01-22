@@ -1,14 +1,14 @@
 <template>
     <div id="detail">
-        <detail-nav-bar class="detail-nav"/>
+        <detail-nav-bar class="detail-nav" @titleClick='titleClick'/>
         <scroll class="content" ref="scroll">
         <detail-swiper :topImages='topImages'></detail-swiper>
         <detail-base-info :goods="goods"></detail-base-info>
         <detail-shop-info :shop="shop"></detail-shop-info>
         <detail-goods-info :detail-info="detailInfo" @imgLoad="imgLoad"/>
-        <detail-param-info :paramInfo="paramInfo"/>
-        <detail-comment-info :comment-info="commentInfo"/>
-        <goods-list :goods='recommends'/>
+        <detail-param-info :paramInfo="paramInfo" ref='params'/>
+        <detail-comment-info :comment-info="commentInfo" ref="comment"/>
+        <goods-list ref="recommend" :goods='recommends'/>
         </scroll>
         
     </div>
@@ -28,6 +28,8 @@ import GoodsList from 'components/content/goods/GoodsList.vue'
 
 
 import {getDetail, Goods, Shop,GoodsParam,getRecommend} from 'network/detail.js'
+import {debounce} from 'components/common/utils.js'
+import {itemListenerMixin} from 'components/common/mixin.js'
 
 
 export default {
@@ -45,6 +47,7 @@ export default {
         
         
     },
+    mixins:[itemListenerMixin],
     data(){
         return{
             iid:null,
@@ -54,7 +57,9 @@ export default {
             detailInfo:{},
             paramInfo:{},
             commentInfo:{},
-            recommends:[]
+            recommends:[],
+            themeTopYs:[],
+            getThemeTopY:null
         }
     },
     created(){
@@ -68,14 +73,30 @@ export default {
     //         })
 
      this._getDetailData();
-     //请求推荐数据
+     //3.请求推荐数据
      getRecommend().then(res => {
          this.recommends = res.data.list
          console.log(res)
      })
+     //4.给getThemeTopY赋值
+     this.getThemeTopY = debounce(() => {
+          this.themeTopYs = []
+                    this.themeTopYs.push(0)
+                    this.themeTopYs.push(this.$refs.params.$el.offsetTop)
+                    this.themeTopYs.push(this.$refs.comment.$el.offsetTop)
+                    this.themeTopYs.push(this.$refs.recommend.$el.offsetTop)
+                    console.log(this.themeTopYs)
+     })
            
 
     },
+    // updated(){
+    //     this.themeTopYs = []
+    //     this.themeTopYs.push(0)
+    //     this.themeTopYs.push(this.$refs.params.$el.offsetTop)
+    //     this.themeTopYs.push(this.$refs.comment.$el.offsetTop)
+    //     this.themeTopYs.push(this.$refs.recommend.$el.offsetTop)
+    // },
     methods:{
         _getDetailData(){
              //1.保存存入的iid
@@ -99,11 +120,42 @@ export default {
                 if(data.rate.cRate !== 0){
                     this.commentInfo = data.rate.list[0]
                 }
+                /*
+                //1.第一次获取，值不对
+                //原因：this.themeTopYs.push(this.$refs.comment.$el没有渲染
+                //  this.themeTopYs = []
+                //     this.themeTopYs.push(0)
+                //     this.themeTopYs.push(this.$refs.params.$el.offsetTop)
+                //     this.themeTopYs.push(this.$refs.comment.$el.offsetTop)
+                //     this.themeTopYs.push(this.$refs.recommend.$el.offsetTop)
+
+                this.$nextTick(() => {
+                    //1.第二次获取，值不对
+                    //原因：图片没有计算在内
+                    //根据最新的数据，对应的DOM是已经被渲染出来
+                    //但是因图片依然是没有加载完（目前获取到的offsetTop不包含其中的图片）
+                    //offsetTop值不对的时候，都是因为图片的问题
+                    this.themeTopYs = []
+                    this.themeTopYs.push(0)
+                    this.themeTopYs.push(this.$refs.params.$el.offsetTop)
+                    this.themeTopYs.push(this.$refs.comment.$el.offsetTop)
+                    this.themeTopYs.push(this.$refs.recommend.$el.offsetTop)
+                    console.log(this.themeTopYs)
+                })*/
             })
         },
         imgLoad(){
-            this.$refs.scroll.refresh()
+            //this.$refs.scroll.refresh()
+            this.newRefresh()
+        },
+        destroyed(){
+            this.$bus.$off('itemImgLoad',this.itemImgListener)
+        },
+        titleClick(index){
+            console.log(index)
+            this.$refs.scroll.scrollTo(0,-this.themeTopYs[index],300)
         }
+        
     }
 
 

@@ -25,10 +25,11 @@
 <script>
 import NavBar from 'components/common/navbar/NavBar.vue'
 import Scroll from 'components/common/scroll/Scroll.vue'
-import {debounce} from 'components/common/utils.js'
 import TabControl from 'components/content/tabcontrol/TabControl.vue'
 import GoodsList from 'components/content/goods/GoodsList.vue'
 import BackTop from 'components/content/backTop/BackTop.vue'
+import {debounce} from 'components/common/utils.js'
+import {itemListenerMixin} from 'components/common/mixin.js'
 
 import HomeSwiper from './childComps/HomeSwiper.vue'
 import RecommendView from './childComps/RecommendView.vue'
@@ -68,6 +69,7 @@ export default {
         saveY:0
       }
     },
+    mixins:[itemListenerMixin],
     created(){
       //请求多个数据
       this.getHomeMultidata()
@@ -81,10 +83,10 @@ export default {
     mounted(){
       //3.监听item中图片加载完成
       //$refs.scroll若在created里面获取可能获取不到
-      const refresh = debounce(this.$refs.scroll.refresh,200)
-      this.$bus.$on('itemImageLoad',() => {
-       refresh()
-      })
+      // const refresh = debounce(this.$refs.scroll.refresh,200)
+      // this.$bus.$on('itemImageLoad',() => {
+      //  refresh()
+      // })
     },
     destroyed(){
     },
@@ -94,6 +96,7 @@ export default {
     },
     deactivated(){
       this.saveY = this.$refs.scroll.scroll.y
+      this.$bus.$off('itemImgLoad',this.itemImgListener)
     },
     computed:{
       showGoods(){
