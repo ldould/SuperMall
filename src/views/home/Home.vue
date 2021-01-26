@@ -27,9 +27,8 @@ import NavBar from 'components/common/navbar/NavBar.vue'
 import Scroll from 'components/common/scroll/Scroll.vue'
 import TabControl from 'components/content/tabcontrol/TabControl.vue'
 import GoodsList from 'components/content/goods/GoodsList.vue'
-import BackTop from 'components/content/backTop/BackTop.vue'
 import {debounce} from 'components/common/utils.js'
-import {itemListenerMixin} from 'components/common/mixin.js'
+import {itemListenerMixin,backTopMixin} from 'components/common/mixin.js'
 
 import HomeSwiper from './childComps/HomeSwiper.vue'
 import RecommendView from './childComps/RecommendView.vue'
@@ -46,9 +45,7 @@ export default {
       FeatureView,
       TabControl,
       GoodsList,
-      Scroll,
-      BackTop,
-       
+      Scroll,       
     },
         
     data(){
@@ -63,13 +60,12 @@ export default {
           "sell":{page:0,list:[]},
         },
         currentType:'pop',
-        isShowBackTop:false,
         tabOffsetTop:0,
         isTabFixed:false,
         saveY:0
       }
     },
-    mixins:[itemListenerMixin],
+    mixins:[itemListenerMixin,backTopMixin],
     created(){
       //请求多个数据
       this.getHomeMultidata()
@@ -122,9 +118,7 @@ export default {
         this.$refs.tabControl1.currentIndex = index;
         this.$refs.tabControl2.currentIndex = index;
       },
-      backClick(){
-        this.$refs.scroll.scrollTo(0,0,3000)
-      },
+      
       contentScroll(position){
         //1.判断BackTop是否显示
         this.isShowBackTop = (-position.y) > 1000
