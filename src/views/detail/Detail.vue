@@ -2,6 +2,9 @@
     <div id="detail">
         <detail-nav-bar class="detail-nav" @titleClick='titleClick' ref="nav"/>
         <scroll class="content" ref="scroll" :probe-type='3' @scroll="contentScroll">
+        <ul>
+            <li v-for="item in $store.state.cartList" :key="item.index">{{item}}</li>
+        </ul>
         <detail-swiper :topImages='topImages'></detail-swiper>
         <detail-base-info :goods="goods"></detail-base-info>
         <detail-shop-info :shop="shop"></detail-shop-info>
@@ -75,8 +78,9 @@ export default {
     //             this.topImages = res.result.itemInfo.topImages
     //         })
 
-    //1.保存存入的iid
+            //1.保存存入的iid
             const iid = this.$route.params.iid
+            this.iid = iid
              //2.根据iid请求详情数据
             getDetail(iid).then(res => {
                 //2.1获取结果
@@ -121,6 +125,7 @@ export default {
                     console.log(this.themeTopYs)
                 })*/
             })
+           
             //3.请求推荐数据
             getRecommend().then(res => {
                 this.recommends = res.data.list
@@ -134,7 +139,6 @@ export default {
                     this.themeTopYs.push(this.$refs.comment.$el.offsetTop)
                     this.themeTopYs.push(this.$refs.recommend.$el.offsetTop)
                      this.themeTopYs.push(Number.MAX_VALUE)
-                    console.log(this.themeTopYs)
                 },100)
      
           
@@ -190,7 +194,11 @@ export default {
             product.image = this.topImages[0]
             product.title = this.goods.title;
             product.desc = this.goods.desc;
-            product.price = this.goods.newPrice
+            product.price = this.goods.realPrice;
+            product.iid = this.iid;
+            //2.将商品添加到购物车
+          //  this.$store.commit('addCart',product)
+            this.$store.dispatch('addCart',product)
 
         }
         
