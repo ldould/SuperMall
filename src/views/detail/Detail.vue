@@ -12,7 +12,7 @@
         </scroll>
         <detail-bottom-bar @addCart='addToCart'/>
         <back-top @click.native="backClick" v-show="isShowBackTop"/>
-        
+        <!-- <toast :message="message" :show="show"/> -->
     </div>
 </template>
 
@@ -30,9 +30,12 @@ import Scroll from 'components/common/scroll/Scroll.vue'
 import GoodsList from 'components/content/goods/GoodsList.vue'
 
 
+
 import {getDetail, Goods, Shop,GoodsParam,getRecommend} from 'network/detail.js'
 import {debounce} from 'components/common/utils.js'
 import {itemListenerMixin,backTopMixin} from 'components/common/mixin.js'
+
+import {mapAction, mapActions} from 'vuex'
 
 
 export default {
@@ -47,7 +50,8 @@ export default {
         DetailParamInfo,
         DetailCommentInfo,
         GoodsList,
-        DetailBottomBar,    
+        DetailBottomBar, 
+        //Toast,
     },
     mixins:[itemListenerMixin,backTopMixin],
     data(){
@@ -63,6 +67,8 @@ export default {
             themeTopYs:[],
             getThemeTopY:null,
             currentIndex:0,
+            // message:'',
+            // show:false
         }
     },
     created(){
@@ -150,7 +156,7 @@ export default {
         
     },
     methods:{
-       
+       ...mapActions(['addCart']),
         imgLoad(){
             //this.$refs.scroll.refresh()
             this.newRefresh()
@@ -195,7 +201,20 @@ export default {
             product.iid = this.iid;
             //2.将商品添加到购物车
           //  this.$store.commit('addCart',product)
-            this.$store.dispatch('addCart',product)
+             this.addCart(product).then(res => {
+                // this.show = true;
+                // this.message = res;
+
+                // setTimeout(() => {
+                //     this.show = false;
+                //     this.message = '';
+                // },1500)
+                this.$toast.show(res,2000)
+            })
+
+            // this.$store.dispatch('addCart',product).then(res => {
+            //     console.log(res)
+            // })
 
         }
         
